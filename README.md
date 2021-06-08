@@ -1,3 +1,31 @@
+Fork from disentanglement_lib to retrain the models reported in 
+
+> [**On Disentangled Representations Learned from Correlated Data**](https://arxiv.org/abs/1811.12359)
+> *Frederik Träuble, Elliot Creager, Niki Kilbertus, Francesco Locatello, Andrea Dittadi, 
+> Anirudh Goyal, Bernhard Schölkopf, Stefan Bauer*. ICML, 2021.
+
+Run same instructions as reported in the original disentanglement_lib (see below) to install.
+
+To train and evaluate all models reported under the unsupervised learning of disentangled 
+representations from correlated data run
+
+```
+dlib_reproduce --model_num=<?> --study=correlation_study --output_directory=output_study_unsupervised/<?>
+```
+where `<?>` should be replaced with a model index between 0 and 3600 which
+corresponds to the ID of which model to train.
+
+To train and evaluate all models reported under the weakly-supervised learning of disentangled 
+representations from correlated data with pairs constructed from the correlated observational data distribution run
+
+```
+dlib_reproduce_ws --model_num=<?> --study=correlation_study_ws_od --output_directory=output_study_ws_od/<?>
+```
+where `<?>` should be replaced with a model index between 0 and 360 which corresponds to the ID of which model to train. Replace the study flag by `correlation_study_ws_id1` (model numbers from 0 to 720) or `correlation_study_ws_id2` (model numbers from 0 to 300) for experiments on interventional data reported in the appendix.
+
+
+---
+
 # disentanglement_lib
 ![Sample visualization](https://github.com/google-research/disentanglement_lib/blob/master/sample.gif?raw=true)
 

@@ -39,22 +39,88 @@ from tensorflow_estimator.python.estimator.tpu.tpu_estimator import TPUEstimator
                                          "random_state",
                                          "return_index"])
 def simple_dynamics(z, ground_truth_data, random_state,
-                    return_index=False, k=gin.REQUIRED):
+                    return_index=False, k=gin.REQUIRED, type=None):
   """Create the pairs."""
-  if k == -1:
-    k_observed = random_state.randint(1, ground_truth_data.num_factors)
+  if type == "od":
+      idx = pair_latents_from_observational_distribution(ground_truth_data, k, z)
+      k_observed = k
+  elif type == "id1":
+      idx = pair_latents_from_interventional_distribution_1(ground_truth_data, k, random_state, z)
+      k_observed = k
+  elif type == "id2":
+      idx = pair_latents_from_interventional_distribution_2(ground_truth_data, k, z)
+      k_observed = k
   else:
-    k_observed = k
-  index_list = random_state.choice(
-      z.shape[1], random_state.choice([1, k_observed]), replace=False)
-  idx = -1
-  for index in index_list:
-    z[:, index] = np.random.choice(
-        range(ground_truth_data.factors_num_values[index]))
-    idx = index
+      if k == -1:
+        k_observed = random_state.randint(1, ground_truth_data.num_factors)
+      else:
+        k_observed = k
+      index_list = random_state.choice(
+          z.shape[1], random_state.choice([1, k_observed]), replace=False)
+      idx = -1
+      for index in index_list:
+        z[:, index] = np.random.choice(
+            range(ground_truth_data.factors_num_values[index]))
+        idx = index
+
   if return_index:
     return z, idx
   return z, k_observed
+
+
+def pair_latents_from_interventional_distribution_1(ground_truth_data, k, random_state, z):
+    factor_change = int(np.random.choice(ground_truth_data.num_factors, k, replace=False))
+    z_intervened = ground_truth_data.sample_factors(1, random_state)
+    z[:, factor_change] = z_intervened[:, factor_change]
+    return factor_change
+
+
+def pair_latents_from_interventional_distribution_2(ground_truth_data, k, z):
+    factor_change = int(np.random.choice(ground_truth_data.num_factors, k, replace=False))
+    corr_factors = ground_truth_data.state_space.get_correlated_factors()
+    if factor_change == corr_factors[1]:
+        corr_factor_1_val = int(z[:, corr_factors[0]])
+        prob_distribution = ground_truth_data.state_space.joint_prob[corr_factor_1_val, :].copy()
+        prob_distribution = prob_distribution / prob_distribution.sum()
+        corr_factor_2_val = np.random.choice(ground_truth_data.factors_num_values[corr_factors[1]], 1,
+                                             p=prob_distribution,
+                                             replace=False)
+        z[:, factor_change] = corr_factor_2_val
+    else:
+        factor_change_values = np.random.choice(ground_truth_data.factors_num_values[factor_change], 2,
+                                                replace=True)
+        z[:, factor_change] = factor_change_values[0]
+        z[:, factor_change] = factor_change_values[1]
+    return factor_change
+
+
+def pair_latents_from_observational_distribution(ground_truth_data, k, z):
+    factor_change = int(np.random.choice(ground_truth_data.num_factors, k, replace=False))
+    corr_factors = ground_truth_data.state_space.get_correlated_factors()
+    corr_factor_1_val = int(z[:, corr_factors[0]])
+    corr_factor_2_val = int(z[:, corr_factors[1]])
+    if factor_change == corr_factors[1]:
+        prob_distribution = ground_truth_data.state_space.joint_prob[corr_factor_1_val, :].copy()
+        prob_distribution[corr_factor_2_val] = 0
+        prob_distribution = prob_distribution / prob_distribution.sum()
+        corr_factor_2_val = np.random.choice(ground_truth_data.factors_num_values[corr_factors[1]], 1,
+                                             p=prob_distribution,
+                                             replace=False)
+        z[:, factor_change] = corr_factor_2_val
+    elif factor_change == corr_factors[0]:
+        prob_distribution = np.transpose(ground_truth_data.state_space.joint_prob[:, corr_factor_2_val].copy())
+        prob_distribution[corr_factor_1_val] = 0
+        prob_distribution = prob_distribution / prob_distribution.sum()
+        corr_factor_1_val = np.random.choice(ground_truth_data.factors_num_values[corr_factors[0]], 1,
+                                             p=prob_distribution,
+                                             replace=False)
+        z[:, factor_change] = corr_factor_1_val
+    else:
+        factor_change_values = np.random.choice(ground_truth_data.factors_num_values[factor_change], 2,
+                                                replace=True)
+        z[:, factor_change] = factor_change_values[0]
+        z[:, factor_change] = factor_change_values[1]
+    return factor_change
 
 
 def train_with_gin(model_dir,
@@ -88,7 +154,8 @@ def train(model_dir,
           training_steps=gin.REQUIRED,
           random_seed=gin.REQUIRED,
           batch_size=gin.REQUIRED,
-          name=""):
+          name="",
+          model_num=None):
   """Trains the estimator and exports the snapshot and the gin config.
 
   The use of this function requires the gin binding 'dataset.name' to be

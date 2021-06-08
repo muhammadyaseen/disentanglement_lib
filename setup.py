@@ -31,6 +31,7 @@ setup(
     scripts=[
         'bin/dlib_aggregate_results',
         'bin/dlib_reproduce',
+        'bin/dlib_reproduce_ws',
         'bin/dlib_reason',
         'bin/dlib_visualize_dataset',
         'bin/dlib_evaluate',
@@ -63,6 +64,7 @@ setup(
         'tensorflow_hub>=0.2',
         'tensorflow_probability==0.7',
         'seaborn',
+        'opencv-python'
     ],
     extras_require={
         'tf': ['tensorflow==1.14'],

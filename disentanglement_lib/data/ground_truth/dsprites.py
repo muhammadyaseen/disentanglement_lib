@@ -63,10 +63,11 @@ class DSprites(ground_truth_data.GroundTruthData):
       self.factor_sizes = np.array(
           data["metadata"][()]["latents_sizes"], dtype=np.int64)
     self.full_factor_sizes = [1, 3, 6, 40, 32, 32]
+    self.factor_names = ["shape", "scale", "orientation", "position x", "position y"]
     self.factor_bases = np.prod(self.factor_sizes) / np.cumprod(
         self.factor_sizes)
-    self.state_space = util.SplitDiscreteStateSpace(self.factor_sizes,
-                                                    self.latent_factor_indices)
+    self.state_space = util.get_state_space(self.factor_sizes,
+                                            self.latent_factor_indices)
 
   @property
   def num_factors(self):
