@@ -1,6 +1,6 @@
 Fork from disentanglement_lib to retrain the models reported in 
 
-> [**On Disentangled Representations Learned from Correlated Data**](https://arxiv.org/abs/1811.12359)
+> [**On Disentangled Representations Learned from Correlated Data**](https://arxiv.org/abs/2006.07886)
 > *Frederik Träuble, Elliot Creager, Niki Kilbertus, Francesco Locatello, Andrea Dittadi, 
 > Anirudh Goyal, Bernhard Schölkopf, Stefan Bauer*. ICML, 2021.
 
