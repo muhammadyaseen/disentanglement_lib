@@ -24,7 +24,7 @@ setup(
     description=('Library for research on disentangled representations.'),
     author='DisentanglementLib Authors',
     author_email='no-reply@google.com',
-    url='http://github.com/google-research/disentanglement_lib',
+    url='http://github.com/muhammadyaseen/disentanglement_lib',
     license='Apache 2.0',
     packages=find_packages(),
     include_package_data=True,
@@ -62,13 +62,13 @@ setup(
         'pandas>=0.23.0',
         'scipy>=1.0.0',
         'tensorflow_hub>=0.2',
-        'tensorflow_probability==0.7',
+        'tensorflow_probability',
         'seaborn',
         'opencv-python'
     ],
     extras_require={
-        'tf': ['tensorflow==1.14'],
-        'tf_gpu': ['tensorflow-gpu==1.14'],
+        'tf': ['tensorflow'],
+        'tf_gpu': ['tensorflow-gpu'],
     },
     classifiers=[
         'Development Status :: 4 - Beta',
