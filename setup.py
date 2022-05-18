@@ -51,7 +51,7 @@ setup(
     install_requires=[
         'future',
         'imageio',
-        'gin-config',
+        'gin-config==0.1.4',
         'scikit-learn',
         'numpy',
         'pandas',
