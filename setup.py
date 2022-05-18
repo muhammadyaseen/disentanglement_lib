@@ -64,7 +64,7 @@ setup(
         'tensorflow_hub>=0.2',
         'tensorflow_probability',
         'seaborn',
-        'opencv-python'
+        'opencv-python-headless'
     ],
     extras_require={
         'tf': ['tensorflow'],
